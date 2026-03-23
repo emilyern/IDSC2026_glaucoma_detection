@@ -5,7 +5,6 @@ import cv2
 import os
 import keras
 from keras.applications.efficientnet import preprocess_input
-from keras import ops
 
 st.title("👁️ Glaucoma Detection")
 
@@ -23,7 +22,9 @@ def preprocess_image(image):
     return np.expand_dims(img_array, axis=0)
 
 def make_gradcam_heatmap(img_array, model):
-    # Find the EfficientNet base model
+    import tensorflow as tf
+
+    # Find EfficientNet base model
     base_model = None
     for layer in model.layers:
         if "efficientnet" in layer.name.lower():
@@ -33,23 +34,18 @@ def make_gradcam_heatmap(img_array, model):
     if base_model is None:
         raise ValueError("EfficientNetB0 base model not found.")
 
-    # Build a sub-model that outputs the last conv layer + base model output
     last_conv_layer = base_model.get_layer("top_conv")
     grad_model = keras.models.Model(
         inputs=base_model.inputs,
         outputs=[last_conv_layer.output, base_model.output]
     )
 
-    # Use keras GradientTape (works without tensorflow)
-    import keras.backend as backend
+    img_tensor = tf.cast(img_array, tf.float32)
 
-    img_tensor = keras.ops.cast(img_array, "float32")
-
-    with keras.backend.GradientTape() as tape:
-        conv_outputs, base_output = grad_model(img_tensor, training=False)
+    with tf.GradientTape() as tape:
+        conv_outputs, _ = grad_model(img_tensor, training=False)
         tape.watch(conv_outputs)
 
-        # Pass through the rest of the model layers
         x = conv_outputs
         for layer in model.layers[1:]:
             x = layer(conv_outputs if layer == model.layers[1] else x, training=False)
@@ -61,13 +57,12 @@ def make_gradcam_heatmap(img_array, model):
     if grads is None:
         raise ValueError("Gradients are None.")
 
-    pooled_grads = keras.ops.mean(grads, axis=(0, 1, 2))
+    pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
     conv_out = conv_outputs[0]
-    heatmap = conv_out @ pooled_grads[..., keras.ops.newaxis]
-    heatmap = keras.ops.squeeze(heatmap)
-    heatmap = keras.ops.maximum(heatmap, 0)
-    heatmap = heatmap / (keras.ops.max(heatmap) + 1e-8)
-    return np.array(heatmap)
+    heatmap = conv_out @ pooled_grads[..., tf.newaxis]
+    heatmap = tf.squeeze(heatmap)
+    heatmap = tf.maximum(heatmap, 0) / (tf.math.reduce_max(heatmap) + 1e-8)
+    return heatmap.numpy()
 
 def overlay_gradcam(original_image_pil, heatmap, alpha=0.4):
     img = np.array(original_image_pil.convert("RGB").resize((224, 224)))
