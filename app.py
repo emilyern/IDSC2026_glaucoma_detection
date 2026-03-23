@@ -128,7 +128,7 @@ st.subheader("📚 Dataset Citation & Info")
 st.info("This AI model was trained using the Hillel Yaffe Glaucoma Dataset (PhysioNet).")
 
 citation = """@misc{yaffe2024glaucoma,
-  title={Hillel Yaffe Glaucoma Dataset},
+  title={Hillel Yaffe Glaucoma Dataset (HYGD): A Gold-Standard Annotated Fundus Dataset for Glaucoma Detection},
   author={Abramovich, Hadas Pizem, Jonathan Fhima, Eran Berkowitz, Ben Gofrit, Jan Van Eijgen, Eytan Blumenthal, Joachim Behar },
   year={2024},
   howpublished={\\url{https://physionet.org/content/hillel-yaffe-glaucoma-dataset/1.0.0/}},
