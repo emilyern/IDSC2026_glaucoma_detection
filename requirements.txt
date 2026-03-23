@@ -1,4 +1,4 @@
-keras==3.5.0
+tf-keras
 numpy==1.26.4
 pandas>=2.0.0
 pillow
