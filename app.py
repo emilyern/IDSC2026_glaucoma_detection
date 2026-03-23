@@ -10,7 +10,7 @@ st.title("👁️ Glaucoma Detection")
 
 @st.cache_resource
 def load_model():
-    return keras.models.load_model("fixed_model.h5", compile=False)
+    return keras.models.load_model("fixed_model.h5")
 
 model = load_model()
 
