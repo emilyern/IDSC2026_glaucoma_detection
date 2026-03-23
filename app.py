@@ -3,8 +3,8 @@ import numpy as np
 from PIL import Image
 import cv2
 import os
-import tf_keras as keras
-from tf_keras.applications.efficientnet import preprocess_input
+import keras
+from keras.applications.efficientnet import preprocess_input
 
 st.title("👁️ Glaucoma Detection")
 
