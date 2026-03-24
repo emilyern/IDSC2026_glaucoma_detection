@@ -121,7 +121,6 @@ if uploaded_file is not None:
 
 st.info("⚠️ For educational purposes only. Not a clinical diagnostic tool.")
 
-# ----------------------------
 # Dataset Citation Section
 st.divider()
 st.subheader("📚 Dataset Citation & Info")
